@@ -1,0 +1,18 @@
+# iPhone Backup Tool Configuration
+
+backup:
+  default_directory: "~/Downloads/iPhoneImageBackup"
+  create_subdirs: true
+  date_format: "%Y/%Y-%m-%d"  # Year/Date
+  
+files:
+  photo_extensions: [".jpg", ".jpeg", ".png", ".heic", ".gif", ".tiff", ".bmp"]
+  video_extensions: [".mov", ".mp4", ".m4v", ".avi", ".mkv"]
+  
+logging:
+  level: "INFO"
+  file: "iphone_backup.log"
+  
+device:
+  auto_connect: true
+  trust_prompt: true
