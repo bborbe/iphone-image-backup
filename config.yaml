@@ -9,6 +9,18 @@ files:
   photo_extensions: [".jpg", ".jpeg", ".png", ".heic", ".gif", ".tiff", ".bmp"]
   video_extensions: [".mov", ".mp4", ".m4v", ".avi", ".mkv"]
   
+  # Files to exclude from backup
+  exclude_files:
+    - "/DCIM/108APPLE/IMG_8548.dng"
+  
+  # Patterns to exclude (supports wildcards)
+  exclude_patterns:
+    - "*/Thumbnails/*"
+    - "*/Cache/*"
+    - "*/Metadata/*"
+    - "*.tmp"
+    - "*.cache"
+  
 logging:
   level: "INFO"
   file: "iphone_backup.log"

@@ -8,6 +8,7 @@ from typing import Dict
 from .device import iPhoneDevice
 from .scanner import PhotoScanner
 from .date_extractor import DateExtractor
+from .config import BackupConfig
 
 logger = logging.getLogger(__name__)
 
@@ -15,13 +16,20 @@ logger = logging.getLogger(__name__)
 class iPhonePhotoBackup:
     """Main backup class that orchestrates the backup process"""
     
-    def __init__(self, backup_dir: str = None):
+    def __init__(self, backup_dir: str = None, config_file: str = None):
         """Initialize iPhone photo backup"""
-        self.backup_dir = Path(backup_dir or f"{Path.home()}/Downloads/iPhone Backup")
+        self.config = BackupConfig(config_file)
+        
+        # Use config default if no backup_dir specified
+        if not backup_dir:
+            backup_dir = self.config.get_backup_directory()
+            backup_dir = Path(backup_dir).expanduser()
+        
+        self.backup_dir = Path(backup_dir)
         self.backup_dir.mkdir(parents=True, exist_ok=True)
         
         self.device = iPhoneDevice()
-        self.scanner = PhotoScanner(self.device)
+        self.scanner = PhotoScanner(self.device, self.config)
         self.date_extractor = DateExtractor(self.device)
         
         self.stats = {
@@ -67,6 +75,12 @@ class iPhonePhotoBackup:
     def backup_photo(self, photo_path: str) -> bool:
         """Backup a single photo"""
         try:
+            # Check if file should be excluded (double-check in case scanner missed it)
+            if self.config.should_exclude_file(photo_path):
+                print(f"⏭️  Excluding: {Path(photo_path).name} (configured exclusion)")
+                self.stats['skipped'] += 1
+                return True
+
             # Get file date
             file_date = self.date_extractor.get_file_date(photo_path)
             

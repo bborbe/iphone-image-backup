@@ -4,18 +4,24 @@ import logging
 from pathlib import Path
 from typing import List, Set
 
+from .config import BackupConfig
+
 logger = logging.getLogger(__name__)
 
 
 class PhotoScanner:
     """Scans iPhone for photos and videos"""
     
-    def __init__(self, device):
+    def __init__(self, device, config: BackupConfig = None):
         self.device = device
-        self.photo_extensions = {
-            '.jpg', '.jpeg', '.png', '.heic', '.gif', '.tiff', '.bmp', 
-            '.mov', '.mp4', '.m4v', '.dng'
-        }
+        self.config = config or BackupConfig()
+        
+        # Get extensions from config
+        photo_exts = self.config.get_photo_extensions()
+        video_exts = self.config.get_video_extensions()
+        self.photo_extensions = set(ext.lower() for ext in photo_exts + video_exts)
+        
+        # Legacy skip dirs (now also handled by config patterns)
         self.skip_dirs = {
             'Thumbnails', 'thumbnails', 'Cache', 'cache', 'Metadata', 'metadata',
             '.thumbnails', '.cache', 'V2', 'v2'
@@ -45,6 +51,11 @@ class PhotoScanner:
                                 file_ext = Path(file).suffix.lower()
 
                                 if file_ext in self.photo_extensions:
+                                    # Check if file should be excluded
+                                    if self.config.should_exclude_file(file_path):
+                                        print(f"⏭️  Excluding: {Path(file_path).name} (configured exclusion)")
+                                        continue
+                                    
                                     photo_paths.append(file_path)
 
                 except Exception as e:
