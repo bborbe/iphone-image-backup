@@ -9,6 +9,7 @@ from .device import iPhoneDevice
 from .scanner import PhotoScanner
 from .date_extractor import DateExtractor
 from .config import BackupConfig
+from .fingerprint import FingerprintManager
 
 logger = logging.getLogger(__name__)
 
@@ -31,11 +32,13 @@ class iPhonePhotoBackup:
         self.device = iPhoneDevice()
         self.scanner = PhotoScanner(self.device, self.config)
         self.date_extractor = DateExtractor(self.device)
+        self.fingerprint_manager = FingerprintManager(self.backup_dir)
         
         self.stats = {
             'total_photos': 0,
             'backed_up': 0,
             'skipped': 0,
+            'duplicates': 0,
             'errors': 0
         }
     
@@ -81,17 +84,28 @@ class iPhonePhotoBackup:
                 self.stats['skipped'] += 1
                 return True
 
+            # Get file data first for fingerprinting
+            file_data = self.device.get_file_contents(photo_path)
+            
+            # Check if this is a duplicate based on content hash
+            duplicate_info = self.fingerprint_manager.get_duplicate_info(file_data)
+            if duplicate_info['is_duplicate']:
+                backup_path = duplicate_info.get('backup_path', 'unknown location')
+                print(f"⏭️  Skipping duplicate: {Path(photo_path).name} (already backed up as {Path(backup_path).name})")
+                self.stats['duplicates'] += 1
+                return True
+
             # Get file date
             file_date = self.date_extractor.get_file_date(photo_path)
             
-            # Check if original file already exists
+            # Check if original file already exists by path
             filename = Path(photo_path).name
             year_date = file_date.strftime("%Y/%Y-%m-%d")
             target_dir = self.backup_dir / year_date
             target_dir.mkdir(parents=True, exist_ok=True)
             original_path = target_dir / filename
 
-            # Skip if already exists
+            # Skip if already exists by path
             if original_path.exists():
                 print(f"⏭️  Skipping existing: {filename}")
                 self.stats['skipped'] += 1
@@ -101,9 +115,10 @@ class iPhonePhotoBackup:
             print(f"📥 Downloading: {filename} → {year_date}/")
 
             with open(original_path, 'wb') as local_file:
-                # Read file from iPhone using get_file_contents
-                file_data = self.device.get_file_contents(photo_path)
                 local_file.write(file_data)
+
+            # Add fingerprint to cache
+            self.fingerprint_manager.add_file_to_cache(original_path, file_data)
 
             self.stats['backed_up'] += 1
             return True
@@ -136,6 +151,7 @@ class iPhonePhotoBackup:
         print(f"📸 Total photos found: {self.stats['total_photos']}")
         print(f"✅ Successfully backed up: {self.stats['backed_up']}")
         print(f"⏭️  Skipped (already exist): {self.stats['skipped']}")
+        print(f"🔄 Skipped (duplicates): {self.stats['duplicates']}")
         print(f"❌ Errors: {self.stats['errors']}")
         print(f"📁 Backup location: {self.backup_dir}")
     

@@ -26,6 +26,7 @@ class TestiPhonePhotoBackup(unittest.TestCase):
         self.backup.device = Mock()
         self.backup.scanner = Mock()
         self.backup.date_extractor = Mock()
+        self.backup.fingerprint_manager = Mock()
     
     def tearDown(self):
         """Clean up temporary directory"""
@@ -72,6 +73,7 @@ class TestiPhonePhotoBackup(unittest.TestCase):
         # Mock dependencies
         self.backup.date_extractor.get_file_date.return_value = file_date
         self.backup.device.get_file_contents.return_value = file_data
+        self.backup.fingerprint_manager.get_duplicate_info.return_value = {'is_duplicate': False}
         
         result = self.backup.backup_photo(photo_path)
         
@@ -86,6 +88,9 @@ class TestiPhonePhotoBackup(unittest.TestCase):
         # Check file content
         with open(expected_path, 'rb') as f:
             self.assertEqual(f.read(), file_data)
+        
+        # Check fingerprint was added to cache
+        self.backup.fingerprint_manager.add_file_to_cache.assert_called_once_with(expected_path, file_data)
     
     def test_backup_photo_existing_file(self):
         """Test backing up a file that already exists"""
@@ -100,6 +105,8 @@ class TestiPhonePhotoBackup(unittest.TestCase):
         
         # Mock dependencies
         self.backup.date_extractor.get_file_date.return_value = file_date
+        self.backup.device.get_file_contents.return_value = b"new_content"
+        self.backup.fingerprint_manager.get_duplicate_info.return_value = {'is_duplicate': False}
         
         result = self.backup.backup_photo(photo_path)
         
@@ -115,8 +122,7 @@ class TestiPhonePhotoBackup(unittest.TestCase):
         photo_path = "/DCIM/100APPLE/IMG_001.jpg"
         file_date = datetime(2023, 12, 25, 15, 30, 45)
         
-        # Mock dependencies
-        self.backup.date_extractor.get_file_date.return_value = file_date
+        # Mock dependencies - device error happens before fingerprint check
         self.backup.device.get_file_contents.side_effect = Exception("Device error")
         
         result = self.backup.backup_photo(photo_path)
@@ -137,6 +143,7 @@ class TestiPhonePhotoBackup(unittest.TestCase):
         self.backup.scanner.scan_for_photos.return_value = photo_paths
         self.backup.date_extractor.get_file_date.return_value = datetime(2023, 12, 25)
         self.backup.device.get_file_contents.return_value = b"fake_data"
+        self.backup.fingerprint_manager.get_duplicate_info.return_value = {'is_duplicate': False}
         
         result = self.backup.backup_all_photos()
         
@@ -176,6 +183,7 @@ class TestiPhonePhotoBackup(unittest.TestCase):
             'total_photos': 0,
             'backed_up': 5,
             'skipped': 3,
+            'duplicates': 0,
             'errors': 1
         }
         
@@ -208,6 +216,36 @@ class TestiPhonePhotoBackup(unittest.TestCase):
         self.backup.list_devices()
         
         self.backup.device.list_devices.assert_called_once()
+    
+    def test_backup_photo_duplicate_detection(self):
+        """Test duplicate detection during backup"""
+        photo_path = "/DCIM/100APPLE/IMG_001.jpg"
+        file_data = b"fake_image_data"
+        
+        # Mock duplicate detection
+        self.backup.device.get_file_contents.return_value = file_data
+        self.backup.fingerprint_manager.get_duplicate_info.return_value = {
+            'is_duplicate': True,
+            'backup_path': '/some/path/IMG_001.jpg'
+        }
+        
+        result = self.backup.backup_photo(photo_path)
+        
+        self.assertTrue(result)
+        self.assertEqual(self.backup.stats['backed_up'], 0)
+        self.assertEqual(self.backup.stats['duplicates'], 1)
+        
+        # Should not call date extraction or create files
+        self.backup.date_extractor.get_file_date.assert_not_called()
+        self.backup.fingerprint_manager.add_file_to_cache.assert_not_called()
+    
+    def test_backup_stats_include_duplicates(self):
+        """Test that backup stats include duplicates count"""
+        stats = self.backup.get_backup_stats()
+        
+        # Should include duplicates in stats
+        self.assertIn('duplicates', stats)
+        self.assertEqual(stats['duplicates'], 0)
 
 
 if __name__ == '__main__':

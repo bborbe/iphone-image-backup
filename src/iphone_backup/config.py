@@ -39,7 +39,7 @@ class BackupConfig:
                 'date_format': "%Y/%Y-%m-%d"
             },
             'files': {
-                'photo_extensions': [".jpg", ".jpeg", ".png", ".heic", ".gif", ".tiff", ".bmp"],
+                'photo_extensions': [".jpg", ".jpeg", ".png", ".heic", ".gif", ".tiff", ".bmp", ".dng", ".raw", ".cr2", ".nef"],
                 'video_extensions': [".mov", ".mp4", ".m4v", ".avi", ".mkv"],
                 'exclude_files': [],
                 'exclude_patterns': [
