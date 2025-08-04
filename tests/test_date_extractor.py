@@ -79,34 +79,34 @@ class TestDateExtractor(unittest.TestCase):
     
     def test_get_filesystem_date_success(self):
         """Test successful filesystem date extraction"""
-        mock_stat = Mock()
-        mock_stat.st_mtime = 1703518245.0  # Unix timestamp for 2023-12-25 15:30:45
+        expected = datetime(2023, 12, 25, 15, 30, 45)
+        mock_stat = {
+            'st_birthtime': expected,
+            'st_mtime': datetime(2023, 12, 24, 10, 0, 0)  # Different date
+        }
         
         self.mock_device.stat.return_value = mock_stat
         
         result = self.extractor._get_filesystem_date('/DCIM/IMG_001.jpg')
         
-        expected = datetime.fromtimestamp(1703518245.0)
         self.assertEqual(result, expected)
     
-    def test_get_filesystem_date_ctime_fallback(self):
-        """Test filesystem date extraction using ctime fallback"""
-        mock_stat = Mock()
-        mock_stat.st_mtime = 0  # Invalid mtime
-        mock_stat.st_ctime = 1703518245.0  # Use ctime instead
+    def test_get_filesystem_date_mtime_fallback(self):
+        """Test filesystem date extraction using mtime fallback"""
+        expected = datetime(2023, 12, 25, 16, 30, 45)
+        mock_stat = {
+            'st_mtime': expected  # No st_birthtime, should use st_mtime
+        }
         
         self.mock_device.stat.return_value = mock_stat
         
         result = self.extractor._get_filesystem_date('/DCIM/IMG_001.jpg')
         
-        expected = datetime.fromtimestamp(1703518245.0)
         self.assertEqual(result, expected)
     
     def test_get_filesystem_date_no_valid_timestamps(self):
         """Test filesystem date extraction with no valid timestamps"""
-        mock_stat = Mock()
-        mock_stat.st_mtime = 0
-        mock_stat.st_ctime = 0
+        mock_stat = {}  # Empty dictionary, no timestamp keys
         
         self.mock_device.stat.return_value = mock_stat
         

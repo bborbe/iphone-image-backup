@@ -8,6 +8,14 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v0.4.1
+
+- fix date extraction logic for iPhone filesystem metadata
+- update date extractor to properly handle AFC stat dictionary format
+- fix filesystem date extraction to prioritize st_birthtime over st_mtime
+- add make test target for running unit tests
+- update test cases to match corrected date extraction implementation
+
 ## v0.4.0
 
 - implement file-based fingerprint system for duplicate prevention

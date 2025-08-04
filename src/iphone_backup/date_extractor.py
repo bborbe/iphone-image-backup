@@ -62,10 +62,11 @@ class DateExtractor:
         """Get date from filesystem metadata"""
         try:
             stat_info = self.device.stat(file_path)
-            if hasattr(stat_info, 'st_mtime') and stat_info.st_mtime > 0:
-                return datetime.fromtimestamp(stat_info.st_mtime)
-            elif hasattr(stat_info, 'st_ctime') and stat_info.st_ctime > 0:
-                return datetime.fromtimestamp(stat_info.st_ctime)
+            # AFC stat returns a dictionary with datetime objects
+            if 'st_birthtime' in stat_info and stat_info['st_birthtime']:
+                return stat_info['st_birthtime']
+            elif 'st_mtime' in stat_info and stat_info['st_mtime']:
+                return stat_info['st_mtime']
         except Exception as e:
             logger.debug(f"Could not get filesystem date for {file_path}: {e}")
         

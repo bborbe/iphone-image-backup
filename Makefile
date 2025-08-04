@@ -1,3 +1,9 @@
+
+precommit: test
+
+test:
+	python -m unittest discover tests/ -v
+
 run:
 	python iphone_backup.py
 
@@ -7,3 +13,4 @@ install:
 pyenv:
 	pyenv virtualenv 3.11.4 iphone-image-backup
 	pyenv local iphone-image-backup
+
