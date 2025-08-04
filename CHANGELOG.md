@@ -8,6 +8,14 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v0.4.2
+
+- modernize PIL API usage by replacing deprecated _getexif() with getexif()
+- improve code safety with .get() method for dictionary access
+- add explanatory comments for timestamp preference logic
+- clean up Makefile formatting and structure
+- update test mocks to match modernized API implementation
+
 ## v0.4.1
 
 - fix date extraction logic for iPhone filesystem metadata
