@@ -43,7 +43,7 @@ class DateExtractor:
             image = Image.open(BytesIO(file_data))
             
             # Get EXIF data
-            exif_data = image._getexif()
+            exif_data = image.getexif()
             if exif_data:
                 for tag, value in exif_data.items():
                     decoded = TAGS.get(tag, tag)
@@ -63,9 +63,11 @@ class DateExtractor:
         try:
             stat_info = self.device.stat(file_path)
             # AFC stat returns a dictionary with datetime objects
-            if 'st_birthtime' in stat_info and stat_info['st_birthtime']:
+            # Prefer st_birthtime (creation time) over st_mtime (modification time)
+            # for more accurate photo dating
+            if stat_info.get('st_birthtime'):
                 return stat_info['st_birthtime']
-            elif 'st_mtime' in stat_info and stat_info['st_mtime']:
+            elif stat_info.get('st_mtime'):
                 return stat_info['st_mtime']
         except Exception as e:
             logger.debug(f"Could not get filesystem date for {file_path}: {e}")

@@ -24,7 +24,7 @@ class TestDateExtractor(unittest.TestCase):
         """Test successful EXIF date extraction"""
         # Mock EXIF data
         mock_img = Mock()
-        mock_img._getexif.return_value = {
+        mock_img.getexif.return_value = {
             306: '2023:12:25 15:30:45',  # DateTime tag
             36867: '2023:12:25 15:30:45',  # DateTimeOriginal tag
         }
@@ -42,7 +42,7 @@ class TestDateExtractor(unittest.TestCase):
     def test_extract_exif_date_no_exif(self, mock_image):
         """Test EXIF extraction when no EXIF data available"""
         mock_img = Mock()
-        mock_img._getexif.return_value = None
+        mock_img.getexif.return_value = None
         mock_image.open.return_value = mock_img
         
         self.mock_device.get_file_contents.return_value = b'fake_image_data'
@@ -55,7 +55,7 @@ class TestDateExtractor(unittest.TestCase):
     def test_extract_exif_date_invalid_format(self, mock_image):
         """Test EXIF extraction with invalid date format"""
         mock_img = Mock()
-        mock_img._getexif.return_value = {
+        mock_img.getexif.return_value = {
             306: 'invalid_date_format',  # Invalid format
         }
         mock_image.open.return_value = mock_img

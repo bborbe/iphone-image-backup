@@ -1,4 +1,3 @@
-
 precommit: test
 
 test:
@@ -13,4 +12,3 @@ install:
 pyenv:
 	pyenv virtualenv 3.11.4 iphone-image-backup
 	pyenv local iphone-image-backup
-
