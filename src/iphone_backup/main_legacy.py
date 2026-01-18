@@ -9,25 +9,20 @@ from .backup import iPhonePhotoBackup
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('iphone_backup.log'),
-        logging.StreamHandler()
-    ]
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("iphone_backup.log"), logging.StreamHandler()],
 )
 
 
-def main():
+def main() -> None:
     """Main function"""
-    parser = argparse.ArgumentParser(description='iPhone Photo Backup Tool')
-    parser.add_argument('-d', '--backup-dir',
-                        help='Backup directory (default: ~/Downloads/iPhone Backup)')
-    parser.add_argument('-l', '--list-devices', action='store_true',
-                        help='List connected devices')
-    parser.add_argument('-i', '--info', action='store_true',
-                        help='Show device information')
-    parser.add_argument('-v', '--verbose', action='store_true',
-                        help='Verbose logging')
+    parser = argparse.ArgumentParser(description="iPhone Photo Backup Tool")
+    parser.add_argument(
+        "-d", "--backup-dir", help="Backup directory (default: ~/Downloads/iPhone Backup)"
+    )
+    parser.add_argument("-l", "--list-devices", action="store_true", help="List connected devices")
+    parser.add_argument("-i", "--info", action="store_true", help="Show device information")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Verbose logging")
 
     args = parser.parse_args()
 

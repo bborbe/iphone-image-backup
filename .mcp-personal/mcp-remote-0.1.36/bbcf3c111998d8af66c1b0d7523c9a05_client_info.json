@@ -1,0 +1,17 @@
+{
+  "redirect_uris": [
+    "http://localhost:5598/oauth/callback"
+  ],
+  "token_endpoint_auth_method": "none",
+  "grant_types": [
+    "authorization_code",
+    "refresh_token"
+  ],
+  "response_types": [
+    "code"
+  ],
+  "client_name": "MCP CLI Proxy",
+  "client_uri": "https://github.com/modelcontextprotocol/mcp-cli",
+  "client_id": "SvNzkKpp7CbhHPvq",
+  "client_id_issued_at": 1768734976
+}

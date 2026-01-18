@@ -8,6 +8,20 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v0.5.0
+
+- migrate to modern Python architecture with pyproject.toml and src/ layout
+- add Pydantic BaseSettings for configuration management
+- implement factory pattern for dependency injection
+- add command pattern with separate modules for backup/info/list-devices
+- add tests/conftest.py with shared pytest fixtures
+- add comprehensive test coverage for command modules
+- improve exception logging in config modules
+- replace print statements with logging in configuration handling
+- add uv.lock for reproducible builds
+- update all modules with strict mypy type checking
+- clean up Makefile precommit message formatting
+
 ## v0.4.2
 
 - modernize PIL API usage by replacing deprecated _getexif() with getexif()
