@@ -2,7 +2,7 @@
 name = "iphone-image-backup"
 version = "0.4.2"
 description = "Direct iPhone photo backup tool using pymobiledevice3"
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 license = { text = "BSD-2-Clause" }
 readme = "README.md"
 authors = [
@@ -38,7 +38,7 @@ packages = ["src/iphone_backup"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py312"
+target-version = "py314"
 src = ["src", "tests"]
 exclude = ["list_iphone_files.py"]
 
@@ -56,7 +56,7 @@ select = [
 ]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.14"
 strict = true
 warn_return_any = true
 warn_unused_ignores = true

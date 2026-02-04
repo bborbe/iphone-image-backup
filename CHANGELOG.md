@@ -8,6 +8,13 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
+## v0.5.2
+
+- Upgrade to Python 3.14
+- Update project dependencies
+- Update type annotations for Generator
+- Add .update-logs/ and .mcp-* to .gitignore
+
 ## v0.5.1
 
 - Fix Makefile precommit target to include sync dependency

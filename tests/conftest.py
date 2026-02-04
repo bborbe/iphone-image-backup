@@ -8,7 +8,7 @@ import pytest
 
 
 @pytest.fixture
-def temp_backup_dir() -> Generator[Path, None, None]:
+def temp_backup_dir() -> Generator[Path]:
     """Create temporary backup directory that's automatically cleaned up.
 
     Yields:
@@ -19,7 +19,7 @@ def temp_backup_dir() -> Generator[Path, None, None]:
 
 
 @pytest.fixture
-def temp_dir() -> Generator[Path, None, None]:
+def temp_dir() -> Generator[Path]:
     """Create temporary directory for general testing.
 
     Yields:
