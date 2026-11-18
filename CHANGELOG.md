@@ -8,7 +8,7 @@ Please choose versions by [Semantic Versioning](http://semver.org/).
 * MINOR version when you add functionality in a backwards-compatible manner, and
 * PATCH version when you make backwards-compatible bug fixes.
 
-## Unreleased
+## v0.5.3
 
 - fix(ci): pin `python-version` to `3.14` instead of `3.x`. `3.x` resolves to the newest release, and on Python 3.15 the `librt` build fails (`gcc … base64/arch/avx/codec.c`), so every PR's required `test` check has been red since the runner image moved. The project already declares `requires-python = ">=3.14"`.
 
